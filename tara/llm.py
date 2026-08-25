@@ -202,8 +202,6 @@ class LLMClient:
                             token = data.get("message", {}).get("content", "")
                             if token:
                                 yield token
-                else:
-                    yield f"Error from Ollama: HTTP {resp.status_code}"
         except Exception as e:
             logger.error(f"Ollama streaming connection error: {e}")
-            raise
+            yield f"Unable to reach local Ollama server at {config.ollama_host}. Please ensure Ollama is running (`ollama serve`) and model '{config.ollama_model}' is available."

@@ -227,7 +227,7 @@ class MemoryStore:
             r"^(?:remember that\s+)?(?:my current project is|my project is|i am building|i'm building|working on project)\s+",
             r"^(?:remember that\s+)?(?:i prefer|i usually use|i typically use|i mostly work with|my favorite|i like|i love|i don't like|i avoid)\s+",
             r"^(?:remember that\s+)?(?:my goal is to|i want to build|disable proactive|enable proactive|turn off proactive|turn on proactive)\b",
-            r"^(?:remember that\s+)?(?:i (?:have )?(?:completed|finished building|successfully built|successfully deployed|shipped|launched))\s+",
+            r"^(?:remember that\s+)?(?:(?:i (?:have )?)?(?:completed|finished building|successfully built|successfully deployed|shipped|launched))\s+",
         ]
         for pattern in long_term_patterns:
             if re.search(pattern, clean):

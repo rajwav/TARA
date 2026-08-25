@@ -34,8 +34,11 @@ wheels/
 # Environment & Secrets (Keep .env.example tracked, ignore .env)
 .env
 
-# Database & Runtime logs
+# Database & Runtime data / logs
+data/
+*.db
 *.db-journal
+*.sqlite3
 *.log
 
 # IDE & Editor

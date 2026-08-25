@@ -89,7 +89,7 @@ class KnowledgeWorkspace:
 
         p = Path(path.strip())
         if p.is_absolute() and p.exists():
-            return p
+            return p.resolve()
         if p.exists():
             return p.resolve()
 
@@ -97,13 +97,15 @@ class KnowledgeWorkspace:
         if base_p.exists():
             return base_p
 
-        raise FileNotFoundError(f"File not found for indexing: '{path}' (searched workspace: {config.base_dir})")
+        return p.resolve()
 
     def index_file(self, path: str) -> dict[str, Any]:
         """
         Index metadata and extracted keywords of a document/code file into SQLite.
         """
         file_path = self._resolve_path(path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"File not found for indexing: '{path}' (searched workspace: {config.base_dir})")
         ext = file_path.suffix.lower()
         filename = file_path.name
 
@@ -208,14 +210,15 @@ class KnowledgeWorkspace:
 
     def remove_file(self, path: str) -> bool:
         """Remove a file from the knowledge index."""
-        abs_path = str(Path(path).resolve())
+        resolved_path = str(self._resolve_path(path))
+        raw_path = str(Path(path))
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("DELETE FROM knowledge_index WHERE path = ?", (abs_path,))
-            cursor.execute("DELETE FROM knowledge_fts WHERE path = ?", (abs_path,))
+            cursor.execute("DELETE FROM knowledge_index WHERE path = ? OR path = ?", (resolved_path, raw_path))
+            cursor.execute("DELETE FROM knowledge_fts WHERE path = ? OR path = ?", (resolved_path, raw_path))
             conn.commit()
             deleted = cursor.rowcount > 0
-            logger.info(f"Removed from knowledge workspace: {abs_path} (success: {deleted})")
+            logger.info(f"Removed from knowledge workspace: {resolved_path} (success: {deleted})")
             return deleted
 
     def get_workspace_summary(self) -> dict[str, Any]:
